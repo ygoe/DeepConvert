@@ -124,6 +124,10 @@ namespace Unclassified.Util
 			// (srcType is never Nullable, it's either null or the element type)
 			if (Nullable.GetUnderlyingType(destType) != null)
 			{
+				// Special handling for empty strings
+				if (value is string && (string)value == "")
+					return null;
+
 				return ChangeType(value, Nullable.GetUnderlyingType(destType), provider, dateFormat, dateNumericKind, dateTimeStyles);
 			}
 

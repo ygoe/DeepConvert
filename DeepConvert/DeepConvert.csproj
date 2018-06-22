@@ -4,15 +4,17 @@
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <RootNamespace>Unclassified.Util</RootNamespace>
     <AssemblyName>Unclassified.DeepConvert</AssemblyName>
+    <Version>1.1.0</Version>
+
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Yves Goergen</Authors>
-    <Company />
     <Description>Converts a data type to another data type, including collections and their items. With special support for DateTime conversions.</Description>
     <Copyright>Yves Goergen</Copyright>
+    <Authors>Yves Goergen</Authors>
+    <Company />
     <PackageTags>convert conversion collections data datetime timestamp type cast types</PackageTags>
-    <RepositoryUrl>https://github.com/ygoe/DeepConvert</RepositoryUrl>
     <PackageProjectUrl>https://github.com/ygoe/DeepConvert</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/ygoe/DeepConvert/blob/master/LICENSE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/ygoe/DeepConvert</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

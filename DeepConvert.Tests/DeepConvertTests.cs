@@ -46,6 +46,8 @@ namespace Unclassified.Util
 		{
 			Assert.AreEqual(4, DeepConvert.ChangeType<int>(4));
 			Assert.AreEqual(null, DeepConvert.ChangeType<int?>(null));
+			Assert.AreEqual(null, DeepConvert.ChangeType<int?>(""));
+			Assert.AreEqual(null, DeepConvert.ChangeType<bool?>(""));
 			Assert.AreEqual(4, DeepConvert.ChangeType<int?>(4));
 		}
 
