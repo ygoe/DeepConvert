@@ -21,6 +21,22 @@ namespace Unclassified.Util
 			Assert.AreEqual(1, DeepConvert.ChangeType<byte>(true));
 		}
 
+		[TestMethod]
+		public void ChangeType_Boolean()
+		{
+			Assert.AreEqual(false, DeepConvert.ChangeType<bool>(0));
+			Assert.AreEqual(true, DeepConvert.ChangeType<bool>(1));
+			Assert.AreEqual(true, DeepConvert.ChangeType<bool>(1.2));
+			Assert.AreEqual(false, DeepConvert.ChangeType<bool>("false"));
+			Assert.AreEqual(false, DeepConvert.ChangeType<bool>("no"));
+			Assert.AreEqual(false, DeepConvert.ChangeType<bool>("off"));
+			Assert.AreEqual(false, DeepConvert.ChangeType<bool>("nein"));
+			Assert.AreEqual(false, DeepConvert.ChangeType<bool>(""));
+			Assert.AreEqual(true, DeepConvert.ChangeType<bool>("true"));
+			Assert.AreEqual(true, DeepConvert.ChangeType<bool>("123"));
+			Assert.AreEqual(true, DeepConvert.ChangeType<bool>("abc"));
+		}
+
 		private enum Enum1 : short
 		{
 			Zero1,

@@ -36,6 +36,7 @@ namespace Unclassified.Util
 		/// </summary>
 		private static readonly string[] falseWords = new[]
 		{
+			"",
 			"0",
 			"false", "no", "n", "off",   // en
 			"falsch", "nein",   // de
