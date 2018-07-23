@@ -201,5 +201,19 @@ namespace Unclassified.Util
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6), dateList[1]);
 			Assert.AreEqual(DateTimeKind.Local, dateList[1].Kind);
 		}
+
+		[TestMethod]
+		public void ToDateTime_NoSeparators()
+		{
+			var date = DeepConvert.ChangeType<DateTime>(
+				"20100101000003",
+				provider: CultureInfo.InvariantCulture,
+				dateFormat: "yyyyMMddHHmmss",
+				dateNumericKind: DateNumericKind.None,
+				dateTimeStyles: DateTimeStyles.None);
+			Assert.AreEqual(typeof(DateTime), date.GetType());
+			Assert.AreEqual(new DateTime(2010, 1, 1, 0, 0, 3), date);
+			Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);
+		}
 	}
 }

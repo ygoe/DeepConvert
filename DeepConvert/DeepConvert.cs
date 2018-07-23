@@ -339,6 +339,7 @@ namespace Unclassified.Util
 				{
 					switch (dateNumericKind)
 					{
+						case DateNumericKind.None:
 						case DateNumericKind.Ticks:
 							return ChangeType(((DateTime)value).Ticks, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
 						case DateNumericKind.UnixSeconds:
@@ -368,6 +369,7 @@ namespace Unclassified.Util
 				{
 					switch (dateNumericKind)
 					{
+						case DateNumericKind.None:
 						case DateNumericKind.Ticks:
 							return ChangeType(((TimeSpan)value).Ticks, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
 						case DateNumericKind.UnixSeconds:
@@ -540,6 +542,7 @@ namespace Unclassified.Util
 				var timeSpan = (TimeSpan)value;
 				switch (numericKind)
 				{
+					case DateNumericKind.None:
 					case DateNumericKind.Ticks:
 						if ((styles & DateTimeStyles.NoCurrentDateDefault) != 0)
 						{
@@ -574,10 +577,13 @@ namespace Unclassified.Util
 				string str = ((string)value).Trim();
 				if (str == "")
 					throw new InvalidCastException($"The empty string cannot be converted to DateTime.");
-				if (long.TryParse(str, NumberStyles.AllowLeadingSign, provider, out long num))
-					return ConvertNumeric(num, numericKind, defaultKind);
-				if (double.TryParse(str, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, provider, out double num2))
-					return ConvertNumeric(num2, numericKind, defaultKind);
+				if (numericKind != DateNumericKind.None)
+				{
+					if (long.TryParse(str, NumberStyles.AllowLeadingSign, provider, out long num))
+						return ConvertNumeric(num, numericKind, defaultKind);
+					if (double.TryParse(str, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, provider, out double num2))
+						return ConvertNumeric(num2, numericKind, defaultKind);
+				}
 
 				if (!string.IsNullOrWhiteSpace(dateFormat) && DateTime.TryParseExact(str, dateFormat, provider, styles, out DateTime date))
 					return date;
@@ -639,6 +645,8 @@ namespace Unclassified.Util
 		{
 			switch (numericKind)
 			{
+				case DateNumericKind.None:
+					throw new ArgumentException("Unsupported date numeric kind.");
 				case DateNumericKind.Ticks:
 					return new DateTime(num, defaultKind);
 				case DateNumericKind.UnixSeconds:
@@ -654,6 +662,8 @@ namespace Unclassified.Util
 		{
 			switch (numericKind)
 			{
+				case DateNumericKind.None:
+					throw new ArgumentException("Unsupported date numeric kind.");
 				case DateNumericKind.Ticks:
 					return new DateTime((long)num, defaultKind);
 				case DateNumericKind.UnixSeconds:
@@ -672,15 +682,20 @@ namespace Unclassified.Util
 	public enum DateNumericKind
 	{
 		/// <summary>
+		/// No numeric interpretation of strings converting to <see cref="DateTime"/>.
+		/// When converting other types, this is equivalent to <see cref="Ticks"/>.
+		/// </summary>
+		None,
+		/// <summary>
 		/// Ticks of 100 nanoseconds since 0001-01-01T00:00:00 (.NET and Windows).
 		/// </summary>
 		Ticks,
 		/// <summary>
-		/// Seconds since UNIX epoch, 1970-01-01T00:00:00Z.
+		/// Seconds since UNIX epoch, 1970-01-01T00:00:00Z (Linux, PHP, and more).
 		/// </summary>
 		UnixSeconds,
 		/// <summary>
-		/// Millieseconds since UNIX epoch, 1970-01-01T00:00:00Z (JavaScript).
+		/// Milliseconds since UNIX epoch, 1970-01-01T00:00:00Z (JavaScript).
 		/// </summary>
 		UnixMilliseconds,
 	}
