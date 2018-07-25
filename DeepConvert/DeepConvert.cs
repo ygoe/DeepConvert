@@ -151,7 +151,13 @@ namespace Unclassified.Util
 				{
 					return Convert.ChangeType(value, destType, provider);
 				}
-				if (destType.IsEnum) return Convert.ChangeType(value, Enum.GetUnderlyingType(destType), provider);
+				if (destType.IsEnum)
+				{
+					// Convert to enum's numeric type, then explicitly to enum type.
+					// This is necessary to further convert to a nullable of the enum.
+					object enumNumericValue = Convert.ChangeType(value, Enum.GetUnderlyingType(destType), provider);
+					return Enum.ToObject(destType, enumNumericValue);
+				}
 			}
 			if (srcType == typeof(string))
 			{

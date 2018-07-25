@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <RootNamespace>Unclassified.Util</RootNamespace>
     <AssemblyName>Unclassified.DeepConvert</AssemblyName>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Converts a data type to another data type, including collections and their items. With special support for DateTime conversions.</Description>

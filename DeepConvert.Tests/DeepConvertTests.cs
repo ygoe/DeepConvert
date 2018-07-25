@@ -55,6 +55,8 @@ namespace Unclassified.Util
 		public void ChangeType_Enums()
 		{
 			Assert.AreEqual(Enum2.One2, DeepConvert.ChangeType<Enum2>(Enum1.One1));
+			Assert.AreEqual(Enum2.One2, DeepConvert.ChangeType<Enum2>(1));
+			Assert.AreEqual(Enum2.One2, DeepConvert.ChangeType<Enum2?>(1));
 		}
 
 		[TestMethod]
