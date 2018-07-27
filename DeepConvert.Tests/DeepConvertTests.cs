@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Unclassified.Util
@@ -57,6 +58,10 @@ namespace Unclassified.Util
 			Assert.AreEqual(Enum2.One2, DeepConvert.ChangeType<Enum2>(Enum1.One1));
 			Assert.AreEqual(Enum2.One2, DeepConvert.ChangeType<Enum2>(1));
 			Assert.AreEqual(Enum2.One2, DeepConvert.ChangeType<Enum2?>(1));
+			Assert.AreEqual(Enum1.One1, DeepConvert.ChangeType<Enum1?>(Enum1.One1));
+			Assert.AreEqual(Enum1.One1, DeepConvert.ChangeType<Enum1?>(true));
+			Assert.AreEqual(Enum1.Zero1, DeepConvert.ChangeType<Enum1?>(false));
+			Assert.AreEqual(Enum1.One1, DeepConvert.ChangeType<Enum1?>(new BigInteger(1)));
 		}
 
 		[TestMethod]

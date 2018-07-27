@@ -277,7 +277,11 @@ namespace Unclassified.Util
 				{
 					return Convert.ChangeType(enumValue, destType, provider);
 				}
-				if (destType.IsEnum) return Convert.ChangeType(enumValue, Enum.GetUnderlyingType(destType), provider);
+				if (destType.IsEnum)
+				{
+					object enumNumericValue = Convert.ChangeType(enumValue, Enum.GetUnderlyingType(destType), provider);
+					return Enum.ToObject(destType, enumNumericValue);
+				}
 				if (destType == typeof(bool)) return !enumValue.Equals(0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger(Convert.ToInt64(enumValue));
 				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime(Convert.ToInt64(enumValue));
@@ -299,7 +303,11 @@ namespace Unclassified.Util
 				if (destType == typeof(float)) return (bool)value ? (float)1 : (float)0;
 				if (destType == typeof(double)) return (bool)value ? (double)1 : (double)0;
 				if (destType == typeof(decimal)) return (bool)value ? (decimal)1 : (decimal)0;
-				if (destType.IsEnum) return (bool)value ? Convert.ChangeType(1, Enum.GetUnderlyingType(destType)) : Convert.ChangeType(0, Enum.GetUnderlyingType(destType));
+				if (destType.IsEnum)
+				{
+					object enumNumericValue = Convert.ChangeType((bool)value ? 1 : 0, Enum.GetUnderlyingType(destType), provider);
+					return Enum.ToObject(destType, enumNumericValue);
+				}
 				if (destType == typeof(bool)) return value;
 				if (destType == typeof(BigInteger)) return (bool)value ? BigInteger.One : BigInteger.Zero;
 				if (destType == typeof(DateTime)) return new DateTime((bool)value ? 1 : 0);
@@ -317,7 +325,11 @@ namespace Unclassified.Util
 				{
 					return Convert.ChangeType(((BigInteger)value).ToString(), destType, provider);
 				}
-				if (destType.IsEnum) return Convert.ChangeType(((BigInteger)value).ToString(), Enum.GetUnderlyingType(destType), provider);
+				if (destType.IsEnum)
+				{
+					object enumNumericValue = Convert.ChangeType(((BigInteger)value).ToString(), Enum.GetUnderlyingType(destType), provider);
+					return Enum.ToObject(destType, enumNumericValue);
+				}
 				if (destType == typeof(bool)) return !((BigInteger)value).IsZero ? true : false;
 				if (destType == typeof(BigInteger)) return value;
 				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime(Convert.ToInt64(((BigInteger)value).ToString(), provider));
