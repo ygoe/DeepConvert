@@ -516,6 +516,12 @@ namespace Unclassified.Util
 				return Convert.ChangeType(value, destType, provider);
 			}
 
+			// Always convert to an object
+			if (destType == typeof(object))
+			{
+				return value;
+			}
+
 			throw new InvalidCastException($"The value '{value}' ({srcType.FullName}) cannot be converted to {destType.FullName}.");
 		}
 

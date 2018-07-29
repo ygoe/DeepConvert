@@ -130,6 +130,19 @@ namespace Unclassified.Util
 		}
 
 		[TestMethod]
+		public void ChangeType_DictionaryObjectArray()
+		{
+			var dict = new Dictionary<object, object>
+			{
+				["a"] = new object[0]
+			};
+			var result = DeepConvert.ChangeType<Dictionary<string, object>>(dict);
+			Assert.AreEqual(1, result.Count);
+			Assert.AreEqual(typeof(object[]), result["a"].GetType());
+			Assert.AreEqual(0, ((object[])result["a"]).Length);
+		}
+
+		[TestMethod]
 		public void ToDateTime_NumericDefault()
 		{
 			var date = DeepConvert.ToDateTime(TimeSpan.TicksPerDay);
