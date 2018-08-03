@@ -20,6 +20,13 @@ namespace Unclassified.Util
 			Assert.AreEqual(false, DeepConvert.ChangeType<bool>(0.0));
 			Assert.AreEqual(true, DeepConvert.ChangeType<bool>(20.0));
 			Assert.AreEqual(1, DeepConvert.ChangeType<byte>(true));
+			Assert.AreEqual(100, DeepConvert.ChangeType<float>(100));
+			Assert.AreEqual(100, DeepConvert.ChangeType<float>("100"));
+			Assert.AreEqual(100, DeepConvert.ChangeType<float>("100.0", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<double>("100"));
+			Assert.AreEqual(100, DeepConvert.ChangeType<double>("100.0", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100"));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100.0", CultureInfo.InvariantCulture));
 		}
 
 		[TestMethod]
@@ -140,6 +147,15 @@ namespace Unclassified.Util
 			Assert.AreEqual(1, result.Count);
 			Assert.AreEqual(typeof(object[]), result["a"].GetType());
 			Assert.AreEqual(0, ((object[])result["a"]).Length);
+		}
+
+		[TestMethod]
+		public void ChangeType_Exponential()
+		{
+			Assert.AreEqual(100, DeepConvert.ChangeType<float>("1.00E+02", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<double>("1.00E+02", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("1.00E+02", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("1,00E+02", new CultureInfo("de-DE")));
 		}
 
 		[TestMethod]

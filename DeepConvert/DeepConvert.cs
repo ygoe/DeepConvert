@@ -147,9 +147,21 @@ namespace Unclassified.Util
 					destType == typeof(short) || destType == typeof(ushort) ||
 					destType == typeof(int) || destType == typeof(uint) ||
 					destType == typeof(long) || destType == typeof(ulong) ||
-					destType == typeof(float) || destType == typeof(double) || destType == typeof(decimal))
+					srcType != typeof(string) && (destType == typeof(float) || destType == typeof(double) || destType == typeof(decimal)))
 				{
 					return Convert.ChangeType(value, destType, provider);
+				}
+				if (destType == typeof(float))
+				{
+					return float.Parse((string)value, NumberStyles.Float, provider);
+				}
+				if (destType == typeof(double))
+				{
+					return double.Parse((string)value, NumberStyles.Float, provider);
+				}
+				if (destType == typeof(decimal))
+				{
+					return decimal.Parse((string)value, NumberStyles.Float, provider);
 				}
 				if (destType.IsEnum)
 				{
