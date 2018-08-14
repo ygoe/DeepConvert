@@ -69,6 +69,8 @@ namespace Unclassified.Util
 			Assert.AreEqual(Enum1.One1, DeepConvert.ChangeType<Enum1?>(true));
 			Assert.AreEqual(Enum1.Zero1, DeepConvert.ChangeType<Enum1?>(false));
 			Assert.AreEqual(Enum1.One1, DeepConvert.ChangeType<Enum1?>(new BigInteger(1)));
+			Assert.AreEqual(Enum1.Zero1, DeepConvert.ChangeType<Enum1>(null));
+			Assert.AreEqual(null, DeepConvert.ChangeType<Enum1?>(null));
 		}
 
 		[TestMethod]

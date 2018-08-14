@@ -116,6 +116,10 @@ namespace Unclassified.Util
 				{
 					return value;
 				}
+				if (destType.IsEnum)
+				{
+					return Enum.ToObject(destType, 0);
+				}
 				throw new InvalidCastException($"The null value cannot be converted into a {destType.FullName}.");
 			}
 
