@@ -440,7 +440,7 @@ namespace Unclassified.Util
 			IEnumerable<object> items = null;
 			if (typeof(IEnumerable).IsAssignableFrom(srcType))
 			{
-				items = ((IEnumerable)value).OfType<object>();
+				items = ((IEnumerable)value).Cast<object>();
 			}
 			// TODO: Also consider derived types from these tuples (which may no longer be generic)
 			else if (srcType.IsGenericType &&

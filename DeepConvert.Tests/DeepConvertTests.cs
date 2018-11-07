@@ -94,6 +94,16 @@ namespace Unclassified.Util
 		}
 
 		[TestMethod]
+		public void ChangeType_ArrayToListWithNull()
+		{
+			var stringList = DeepConvert.ChangeType<List<string>>(new object[] { null, "item2" });
+			Assert.AreEqual(typeof(List<string>), stringList.GetType());
+			Assert.AreEqual(2, stringList.Count);
+			Assert.AreEqual(null, stringList[0]);
+			Assert.AreEqual("item2", stringList[1]);
+		}
+
+		[TestMethod]
 		public void ChangeType_ArrayToTuple()
 		{
 			var tuple = DeepConvert.ChangeType<Tuple<short, long, string, char, bool>>(new object[] { "1", "2", 3, 4, 5, 6 });
