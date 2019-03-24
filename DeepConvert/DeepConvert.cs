@@ -501,7 +501,7 @@ namespace Unclassified.Util
 				{
 					return CreateTuple(destType, items, provider, dateFormat, dateNumericKind, dateTimeStyles);
 				}
-				var collectionType = destType.GetInterfaces().FirstOrDefault(t => t.GetGenericTypeDefinition() == typeof(ICollection<>));
+				var collectionType = destType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>));
 				if (collectionType != null)
 				{
 					object list = Activator.CreateInstance(destType);
