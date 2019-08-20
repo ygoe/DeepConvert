@@ -13,6 +13,11 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ChangeType_Numerics()
 		{
+			var ics = new DeepConvertSettings
+			{
+				Provider = CultureInfo.InvariantCulture
+			};
+
 			Assert.AreEqual(20, DeepConvert.ChangeType<byte>(20));
 			Assert.AreEqual("20", DeepConvert.ChangeType<string>(20.0));
 			Assert.AreEqual(false, DeepConvert.ChangeType<bool>(0));
@@ -22,11 +27,11 @@ namespace Unclassified.Util
 			Assert.AreEqual(1, DeepConvert.ChangeType<byte>(true));
 			Assert.AreEqual(100, DeepConvert.ChangeType<float>(100));
 			Assert.AreEqual(100, DeepConvert.ChangeType<float>("100"));
-			Assert.AreEqual(100, DeepConvert.ChangeType<float>("100.0", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<float>("100.0", ics));
 			Assert.AreEqual(100, DeepConvert.ChangeType<double>("100"));
-			Assert.AreEqual(100, DeepConvert.ChangeType<double>("100.0", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<double>("100.0", ics));
 			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100"));
-			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100.0", CultureInfo.InvariantCulture));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100.0", ics));
 		}
 
 		[TestMethod]
@@ -164,10 +169,19 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ChangeType_Exponential()
 		{
-			Assert.AreEqual(100, DeepConvert.ChangeType<float>("1.00E+02", CultureInfo.InvariantCulture));
-			Assert.AreEqual(100, DeepConvert.ChangeType<double>("1.00E+02", CultureInfo.InvariantCulture));
-			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("1.00E+02", CultureInfo.InvariantCulture));
-			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("1,00E+02", new CultureInfo("de-DE")));
+			var ics = new DeepConvertSettings
+			{
+				Provider = CultureInfo.InvariantCulture
+			};
+			var decs = new DeepConvertSettings
+			{
+				Provider = new CultureInfo("de-DE")
+			};
+
+			Assert.AreEqual(100, DeepConvert.ChangeType<float>("1.00E+02", ics));
+			Assert.AreEqual(100, DeepConvert.ChangeType<double>("1.00E+02", ics));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("1.00E+02", ics));
+			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("1,00E+02", decs));
 		}
 
 		[TestMethod]
@@ -181,7 +195,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_NumericUnixSeconds()
 		{
-			var date = DeepConvert.ToDateTime(2 * 86400, numericKind: DateNumericKind.UnixSeconds);
+			var date = DeepConvert.ToDateTime(2 * 86400, new DeepConvertSettings { DateNumericKind = DateNumericKind.UnixSeconds });
 			Assert.AreEqual(new DateTime(1970, 1, 3, 0, 0, 0), date);
 			Assert.AreEqual(DateTimeKind.Utc, date.Kind);
 		}
@@ -189,7 +203,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_NumericUnixMilliseconds()
 		{
-			var date = DeepConvert.ToDateTime(3 * 86400 * 1000, numericKind: DateNumericKind.UnixMilliseconds);
+			var date = DeepConvert.ToDateTime(3 * 86400 * 1000, new DeepConvertSettings { DateNumericKind = DateNumericKind.UnixMilliseconds });
 			Assert.AreEqual(new DateTime(1970, 1, 4, 0, 0, 0), date);
 			Assert.AreEqual(DateTimeKind.Utc, date.Kind);
 		}
@@ -197,7 +211,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_DoubleUnixMilliseconds()
 		{
-			var date = DeepConvert.ToDateTime(3.5 * 86400 * 1000, numericKind: DateNumericKind.UnixMilliseconds);
+			var date = DeepConvert.ToDateTime(3.5 * 86400 * 1000, new DeepConvertSettings { DateNumericKind = DateNumericKind.UnixMilliseconds });
 			Assert.AreEqual(new DateTime(1970, 1, 4, 12, 0, 0), date);
 			Assert.AreEqual(DateTimeKind.Utc, date.Kind);
 		}
@@ -205,7 +219,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_StringFormat()
 		{
-			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", dateFormat: "yy.MM.dd HH.mm.ss");
+			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", new DeepConvertSettings { DateFormat = "yy.MM.dd HH.mm.ss" });
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6), date);
 			Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);
 		}
@@ -213,7 +227,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_StringFormatLocal()
 		{
-			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", dateFormat: "yy.MM.dd HH.mm.ss", styles: DateTimeStyles.AssumeLocal);
+			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", new DeepConvertSettings { DateFormat = "yy.MM.dd HH.mm.ss", DateTimeStyles = DateTimeStyles.AssumeLocal });
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6), date);
 			Assert.AreEqual(DateTimeKind.Local, date.Kind);
 		}
@@ -221,7 +235,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_StringUtcToLocal()
 		{
-			var date = DeepConvert.ToDateTime("2018-02-03 04:05:06", styles: DateTimeStyles.AssumeUniversal);
+			var date = DeepConvert.ToDateTime("2018-02-03 04:05:06", new DeepConvertSettings { DateTimeStyles = DateTimeStyles.AssumeUniversal });
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6, DateTimeKind.Utc).ToLocalTime(), date);
 			Assert.AreEqual(DateTimeKind.Local, date.Kind);
 		}
@@ -229,7 +243,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_StringLocalToUtc()
 		{
-			var date = DeepConvert.ToDateTime("2018-02-03 04:05:06", styles: DateTimeStyles.AssumeLocal | DateTimeStyles.AdjustToUniversal);
+			var date = DeepConvert.ToDateTime("2018-02-03 04:05:06", new DeepConvertSettings { DateTimeStyles = DateTimeStyles.AssumeLocal | DateTimeStyles.AdjustToUniversal });
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6, DateTimeKind.Local).ToUniversalTime(), date);
 			Assert.AreEqual(DateTimeKind.Utc, date.Kind);
 		}
@@ -239,9 +253,12 @@ namespace Unclassified.Util
 		{
 			var dateList = DeepConvert.ChangeType<List<DateTime>>(
 				new object[] { 10 * 86400, "18.02.03 04.05.06" },
-				dateFormat: "yy.MM.dd HH.mm.ss",
-				dateNumericKind: DateNumericKind.UnixSeconds,
-				dateTimeStyles: DateTimeStyles.AssumeLocal);
+				new DeepConvertSettings
+				{
+					DateFormat = "yy.MM.dd HH.mm.ss",
+					DateNumericKind = DateNumericKind.UnixSeconds,
+					DateTimeStyles = DateTimeStyles.AssumeLocal
+				});
 			Assert.AreEqual(typeof(List<DateTime>), dateList.GetType());
 			Assert.AreEqual(2, dateList.Count);
 			Assert.AreEqual(new DateTime(1970, 1, 11, 0, 0, 0), dateList[0]);
@@ -255,10 +272,13 @@ namespace Unclassified.Util
 		{
 			var date = DeepConvert.ChangeType<DateTime>(
 				"20100101000003",
-				provider: CultureInfo.InvariantCulture,
-				dateFormat: "yyyyMMddHHmmss",
-				dateNumericKind: DateNumericKind.None,
-				dateTimeStyles: DateTimeStyles.None);
+				new DeepConvertSettings
+				{
+					Provider = CultureInfo.InvariantCulture,
+					DateFormat = "yyyyMMddHHmmss",
+					DateNumericKind = DateNumericKind.None,
+					DateTimeStyles = DateTimeStyles.None
+				});
 			Assert.AreEqual(typeof(DateTime), date.GetType());
 			Assert.AreEqual(new DateTime(2010, 1, 1, 0, 0, 3), date);
 			Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);

@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 
 namespace Unclassified.Util
 {
@@ -68,21 +69,22 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <typeparam name="T">The type to convert the data to.</typeparam>
 		/// <param name="value">The data to convert.</param>
-		/// <param name="provider">An object that supplies culture-specific formatting information.
-		///    If unset, CultureInfo.CurrentCulture is used.</param>
-		/// <param name="dateFormat">A date format string to parse non-numeric strings with.</param>
-		/// <param name="dateNumericKind">Specifies how numeric values can be interpreted as date.</param>
-		/// <param name="dateTimeStyles">Specifies how to interpret the parsed date in relation to the
-		///   current time zone or the current date.</param>
 		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
 		///   to <paramref name="value"/>.</returns>
-		public static T ChangeType<T>(
-			object value,
-			IFormatProvider provider = null,
-			string dateFormat = null,
-			DateNumericKind dateNumericKind = DateNumericKind.Ticks,
-			DateTimeStyles dateTimeStyles = DateTimeStyles.None) =>
-			(T)ChangeType(value, typeof(T), provider, dateFormat, dateNumericKind, dateTimeStyles);
+		public static T ChangeType<T>(object value) =>
+			(T)ChangeType(value, typeof(T), new DeepConvertSettings());
+
+		/// <summary>
+		/// Returns an object of the specified type whose value is equivalent to the specified
+		/// object.
+		/// </summary>
+		/// <typeparam name="T">The type to convert the data to.</typeparam>
+		/// <param name="value">The data to convert.</param>
+		/// <param name="settings">The conversion settings.</param>
+		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
+		///   to <paramref name="value"/>.</returns>
+		public static T ChangeType<T>(object value, DeepConvertSettings settings) =>
+			(T)ChangeType(value, typeof(T), settings);
 
 		/// <summary>
 		/// Returns an object of the specified type whose value is equivalent to the specified
@@ -90,22 +92,23 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="value">The data to convert.</param>
 		/// <param name="destType">The type to convert the data to.</param>
-		/// <param name="provider">An object that supplies culture-specific formatting information.
-		///    If unset, CultureInfo.CurrentCulture is used.</param>
-		/// <param name="dateFormat">A date format string to parse non-numeric strings with.</param>
-		/// <param name="dateNumericKind">Specifies how numeric values can be interpreted as date.</param>
-		/// <param name="dateTimeStyles">Specifies how to interpret the parsed date in relation to the
-		///   current time zone or the current date.</param>
 		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
 		///   equivalent to <paramref name="value"/>.</returns>
-		public static object ChangeType(
-			object value,
-			Type destType,
-			IFormatProvider provider = null,
-			string dateFormat = null,
-			DateNumericKind dateNumericKind = DateNumericKind.Ticks,
-			DateTimeStyles dateTimeStyles = DateTimeStyles.None)
+		public static object ChangeType(object value, Type destType) =>
+			ChangeType(value, destType, new DeepConvertSettings());
+
+		/// <summary>
+		/// Returns an object of the specified type whose value is equivalent to the specified
+		/// object.
+		/// </summary>
+		/// <param name="value">The data to convert.</param>
+		/// <param name="destType">The type to convert the data to.</param>
+		/// <param name="settings">The conversion settings.</param>
+		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
+		///   equivalent to <paramref name="value"/>.</returns>
+		public static object ChangeType(object value, Type destType, DeepConvertSettings settings)
 		{
+			var provider = settings.Provider;
 			if (provider == null)
 				provider = CultureInfo.CurrentCulture;
 
@@ -133,7 +136,7 @@ namespace Unclassified.Util
 				if (value is string && (string)value == "")
 					return null;
 
-				return ChangeType(value, Nullable.GetUnderlyingType(destType), provider, dateFormat, dateNumericKind, dateTimeStyles);
+				return ChangeType(value, Nullable.GetUnderlyingType(destType), settings);
 			}
 
 			// Atomic types:
@@ -179,7 +182,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !falseWords.Any(w => string.Equals(w, (string)value, StringComparison.OrdinalIgnoreCase));
 				if (destType == typeof(BigInteger)) return BigInteger.Parse((string)value, provider);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //DateTime.Parse((string)value, provider);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //DateTime.Parse((string)value, provider);
 				if (destType == typeof(TimeSpan)) return TimeSpan.Parse((string)value, provider);
 				if (destType == typeof(Guid)) return Guid.Parse((string)value);
 				// TODO: Convert with collection of chars (also in reverse direction)
@@ -188,7 +191,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((char)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((char)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((char)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((char)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((char)value);
 				// No conversion to Guid
 			}
@@ -196,7 +199,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((byte)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((byte)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((byte)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((byte)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((byte)value);
 				// No conversion to Guid
 			}
@@ -204,7 +207,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((sbyte)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((sbyte)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((sbyte)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((sbyte)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((sbyte)value);
 				// No conversion to Guid
 			}
@@ -212,7 +215,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((short)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((short)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((short)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((short)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((short)value);
 				// No conversion to Guid
 			}
@@ -220,7 +223,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((ushort)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((ushort)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((ushort)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((ushort)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((ushort)value);
 				// No conversion to Guid
 			}
@@ -228,7 +231,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals(0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((int)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((int)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((int)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((int)value);
 				// No conversion to Guid
 			}
@@ -236,7 +239,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((uint)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((uint)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((uint)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((uint)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((uint)value);
 				// No conversion to Guid
 			}
@@ -244,7 +247,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((long)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((long)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((long)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)value);
 				// No conversion to Guid
 			}
@@ -252,7 +255,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((ulong)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((ulong)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((long)(ulong)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(ulong)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(ulong)value);
 				// No conversion to Guid
 			}
@@ -260,7 +263,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((float)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((float)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((long)(float)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(float)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(float)value);
 				// No conversion to Guid
 			}
@@ -268,7 +271,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((double)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((double)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((long)(double)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(double)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(double)value);
 				// No conversion to Guid
 			}
@@ -276,7 +279,7 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !value.Equals((decimal)0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger((decimal)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime((long)(decimal)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(decimal)value);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(decimal)value);
 				// No conversion to Guid
 			}
@@ -300,7 +303,7 @@ namespace Unclassified.Util
 				}
 				if (destType == typeof(bool)) return !enumValue.Equals(0) ? true : false;
 				if (destType == typeof(BigInteger)) return new BigInteger(Convert.ToInt64(enumValue));
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime(Convert.ToInt64(enumValue));
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime(Convert.ToInt64(enumValue));
 				if (destType == typeof(TimeSpan)) return new TimeSpan(Convert.ToInt64(enumValue));
 				// No conversion to Guid
 			}
@@ -348,7 +351,7 @@ namespace Unclassified.Util
 				}
 				if (destType == typeof(bool)) return !((BigInteger)value).IsZero ? true : false;
 				if (destType == typeof(BigInteger)) return value;
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime(Convert.ToInt64(((BigInteger)value).ToString(), provider));
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime(Convert.ToInt64(((BigInteger)value).ToString(), provider));
 				if (destType == typeof(TimeSpan)) return new TimeSpan(Convert.ToInt64(((BigInteger)value).ToString(), provider));
 				// No conversion to Guid
 			}
@@ -356,9 +359,9 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(string))
 				{
-					if (!string.IsNullOrEmpty(dateFormat))
+					if (!string.IsNullOrEmpty(settings.DateFormat))
 					{
-						return ((DateTime)value).ToString(dateFormat, provider);
+						return ((DateTime)value).ToString(settings.DateFormat, provider);
 					}
 					return ((DateTime)value).ToString(provider);
 				}
@@ -371,15 +374,15 @@ namespace Unclassified.Util
 					destType == typeof(BigInteger) ||
 					destType.IsEnum)
 				{
-					switch (dateNumericKind)
+					switch (settings.DateNumericKind)
 					{
 						case DateNumericKind.None:
 						case DateNumericKind.Ticks:
-							return ChangeType(((DateTime)value).Ticks, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
+							return ChangeType(((DateTime)value).Ticks, destType, settings);
 						case DateNumericKind.UnixSeconds:
-							return ChangeType((((DateTime)value).ToUniversalTime() - unixEpoch).TotalSeconds, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
+							return ChangeType((((DateTime)value).ToUniversalTime() - unixEpoch).TotalSeconds, destType, settings);
 						case DateNumericKind.UnixMilliseconds:
-							return ChangeType((((DateTime)value).ToUniversalTime() - unixEpoch).TotalMilliseconds, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
+							return ChangeType((((DateTime)value).ToUniversalTime() - unixEpoch).TotalMilliseconds, destType, settings);
 						default:
 							throw new ArgumentException("Unknown date numeric kind.");
 					}
@@ -401,22 +404,22 @@ namespace Unclassified.Util
 					destType == typeof(BigInteger) ||
 					destType.IsEnum)
 				{
-					switch (dateNumericKind)
+					switch (settings.DateNumericKind)
 					{
 						case DateNumericKind.None:
 						case DateNumericKind.Ticks:
-							return ChangeType(((TimeSpan)value).Ticks, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
+							return ChangeType(((TimeSpan)value).Ticks, destType, settings);
 						case DateNumericKind.UnixSeconds:
-							return ChangeType(((TimeSpan)value).TotalSeconds, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
+							return ChangeType(((TimeSpan)value).TotalSeconds, destType, settings);
 						case DateNumericKind.UnixMilliseconds:
-							return ChangeType(((TimeSpan)value).TotalMilliseconds, destType, provider, dateFormat, dateNumericKind, dateTimeStyles);
+							return ChangeType(((TimeSpan)value).TotalMilliseconds, destType, settings);
 						default:
 							throw new ArgumentException("Unknown date numeric kind.");
 					}
 					//return Convert.ChangeType(((TimeSpan)value).Ticks, destType);
 				}
 				if (destType == typeof(bool)) return ((TimeSpan)value).Ticks != 0 ? true : false;
-				if (destType == typeof(DateTime)) return ToDateTime(value, provider, dateFormat, dateNumericKind, dateTimeStyles); //new DateTime(((TimeSpan)value).Ticks);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime(((TimeSpan)value).Ticks);
 				if (destType == typeof(TimeSpan)) return value;
 				// No conversion to Guid
 			}
@@ -470,7 +473,7 @@ namespace Unclassified.Util
 				{
 					var destArray = Array.CreateInstance(destType.GetElementType(), items.Count());
 					int index = 0;
-					foreach (object item in items.Select(o => ChangeType(o, destType.GetElementType(), provider, dateFormat, dateNumericKind, dateTimeStyles)))
+					foreach (object item in items.Select(o => ChangeType(o, destType.GetElementType(), settings)))
 					{
 						destArray.SetValue(item, index++);
 					}
@@ -488,7 +491,7 @@ namespace Unclassified.Util
 				{
 					var destArray = Array.CreateInstance(destType.GenericTypeArguments[0], items.Count());
 					int index = 0;
-					foreach (object item in items.Select(o => ChangeType(o, destType.GenericTypeArguments[0], provider, dateFormat, dateNumericKind, dateTimeStyles)))
+					foreach (object item in items.Select(o => ChangeType(o, destType.GenericTypeArguments[0], settings)))
 					{
 						destArray.SetValue(item, index++);
 					}
@@ -499,14 +502,14 @@ namespace Unclassified.Util
 					destType.GetGenericTypeDefinition().FullName.StartsWith("System.ValueTuple`") ||
 					destType.GetGenericTypeDefinition() == typeof(KeyValuePair<,>)))
 				{
-					return CreateTuple(destType, items, provider, dateFormat, dateNumericKind, dateTimeStyles);
+					return CreateTuple(destType, items, settings);
 				}
 				var collectionType = destType.GetInterfaces().FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>));
 				if (collectionType != null)
 				{
 					object list = Activator.CreateInstance(destType);
 					var add = collectionType.GetMethod("Add");
-					foreach (object item in items.Select(o => ChangeType(o, collectionType.GenericTypeArguments[0], provider, dateFormat, dateNumericKind, dateTimeStyles)))
+					foreach (object item in items.Select(o => ChangeType(o, collectionType.GenericTypeArguments[0], settings)))
 					{
 						add.Invoke(list, new[] { item });
 					}
@@ -545,27 +548,26 @@ namespace Unclassified.Util
 		/// Returns a DateTime value whose value is equivalent to the specified object.
 		/// </summary>
 		/// <param name="value">The data to convert.</param>
-		/// <param name="provider">An object that supplies culture-specific formatting information.
-		///    If unset, CultureInfo.CurrentCulture is used.</param>
-		/// <param name="dateFormat">A date format string to parse non-numeric strings with.</param>
-		/// <param name="numericKind">Specifies how numeric values can be interpreted as date.</param>
-		/// <param name="styles">Specifies how to interpret the parsed date in relation to the
-		///   current time zone or the current date.</param>
 		/// <returns>A DateTime value whose value is equivalent to <paramref name="value"/>.</returns>
-		public static DateTime ToDateTime(
-			object value,
-			IFormatProvider provider = null,
-			string dateFormat = null,
-			DateNumericKind numericKind = DateNumericKind.Ticks,
-			DateTimeStyles styles = DateTimeStyles.None)
+		public static DateTime ToDateTime(object value) =>
+			ToDateTime(value, new DeepConvertSettings());
+
+		/// <summary>
+		/// Returns a DateTime value whose value is equivalent to the specified object.
+		/// </summary>
+		/// <param name="value">The data to convert.</param>
+		/// <param name="settings">The conversion settings.</param>
+		/// <returns>A DateTime value whose value is equivalent to <paramref name="value"/>.</returns>
+		public static DateTime ToDateTime(object value, DeepConvertSettings settings)
 		{
+			var provider = settings.Provider;
 			if (provider == null)
 				provider = CultureInfo.CurrentCulture;
 
 			var defaultKind = DateTimeKind.Unspecified;
-			if ((styles & DateTimeStyles.AssumeLocal) != 0)
+			if ((settings.DateTimeStyles & DateTimeStyles.AssumeLocal) != 0)
 				defaultKind = DateTimeKind.Local;
-			if ((styles & DateTimeStyles.AssumeUniversal) != 0)
+			if ((settings.DateTimeStyles & DateTimeStyles.AssumeUniversal) != 0)
 				defaultKind = DateTimeKind.Utc;
 
 			if (value == null)
@@ -580,11 +582,11 @@ namespace Unclassified.Util
 			if (srcType == typeof(TimeSpan))
 			{
 				var timeSpan = (TimeSpan)value;
-				switch (numericKind)
+				switch (settings.DateNumericKind)
 				{
 					case DateNumericKind.None:
 					case DateNumericKind.Ticks:
-						if ((styles & DateTimeStyles.NoCurrentDateDefault) != 0)
+						if ((settings.DateTimeStyles & DateTimeStyles.NoCurrentDateDefault) != 0)
 						{
 							return new DateTime(timeSpan.Ticks, defaultKind);
 						}
@@ -604,30 +606,31 @@ namespace Unclassified.Util
 				srcType == typeof(long) || srcType == typeof(ulong) ||
 				srcType == typeof(BigInteger))
 			{
-				long num = ChangeType<long>(value, provider, dateFormat, numericKind, styles);
-				return ConvertNumeric(num, numericKind, defaultKind);
+				long num = ChangeType<long>(value, settings);
+				return ConvertNumeric(num, settings.DateNumericKind, defaultKind);
 			}
 			if (srcType == typeof(float) || srcType == typeof(double) || srcType == typeof(decimal))
 			{
-				double num = ChangeType<double>(value, provider, dateFormat, numericKind, styles);
-				return ConvertNumeric(num, numericKind, defaultKind);
+				double num = ChangeType<double>(value, settings);
+				return ConvertNumeric(num, settings.DateNumericKind, defaultKind);
 			}
 			if (srcType == typeof(string))
 			{
 				string str = ((string)value).Trim();
 				if (str == "")
 					throw new InvalidCastException($"The empty string cannot be converted to DateTime.");
-				if (numericKind != DateNumericKind.None)
+				if (settings.DateNumericKind != DateNumericKind.None)
 				{
 					if (long.TryParse(str, NumberStyles.AllowLeadingSign, provider, out long num))
-						return ConvertNumeric(num, numericKind, defaultKind);
+						return ConvertNumeric(num, settings.DateNumericKind, defaultKind);
 					if (double.TryParse(str, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, provider, out double num2))
-						return ConvertNumeric(num2, numericKind, defaultKind);
+						return ConvertNumeric(num2, settings.DateNumericKind, defaultKind);
 				}
 
-				if (!string.IsNullOrWhiteSpace(dateFormat) && DateTime.TryParseExact(str, dateFormat, provider, styles, out DateTime date))
+				if (!string.IsNullOrWhiteSpace(settings.DateFormat) &&
+					DateTime.TryParseExact(str, settings.DateFormat, provider, settings.DateTimeStyles, out DateTime date))
 					return date;
-				if (DateTime.TryParse(str, provider, styles, out date))
+				if (DateTime.TryParse(str, provider, settings.DateTimeStyles, out date))
 					return date;
 			}
 			throw new InvalidCastException($"The value '{value}' ({srcType.FullName}) cannot be converted to DateTime.");
@@ -649,12 +652,9 @@ namespace Unclassified.Util
 		private static object CreateTuple(
 			Type tupleType,
 			IEnumerable<object> items,
-			IFormatProvider provider,
-			string dateFormat,
-			DateNumericKind dateNumericKind,
-			DateTimeStyles dateTimeStyles)
+			DeepConvertSettings settings)
 		{
-			object[] args = GetConvertedValues(items, tupleType.GenericTypeArguments, provider, dateFormat, dateNumericKind, dateTimeStyles)
+			object[] args = GetConvertedValues(items, tupleType.GenericTypeArguments, settings)
 				.Concat(GetDefaultValues(tupleType.GenericTypeArguments.Skip(items.Count())))
 				.ToArray();
 			return Activator.CreateInstance(tupleType, args);
@@ -663,14 +663,11 @@ namespace Unclassified.Util
 		private static IEnumerable<object> GetConvertedValues(
 			IEnumerable<object> items,
 			IEnumerable<Type> types,
-			IFormatProvider provider,
-			string dateFormat,
-			DateNumericKind dateNumericKind,
-			DateTimeStyles dateTimeStyles)
+			DeepConvertSettings settings)
 		{
 			return items
 				.Take(types.Count())
-				.Select((o, i) => ChangeType(o, types.ElementAt(i), provider, dateFormat, dateNumericKind, dateTimeStyles));
+				.Select((o, i) => ChangeType(o, types.ElementAt(i), settings));
 		}
 
 		private static IEnumerable<object> GetDefaultValues(IEnumerable<Type> types)
@@ -714,6 +711,62 @@ namespace Unclassified.Util
 					throw new ArgumentException("Unknown date numeric kind.");
 			}
 		}
+	}
+
+	/// <summary>
+	/// Provides settings for special data conversions.
+	/// </summary>
+	public class DeepConvertSettings
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DeepConvertSettings"/> class.
+		/// </summary>
+		public DeepConvertSettings()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DeepConvertSettings"/> class from another
+		/// instance.
+		/// </summary>
+		/// <param name="source">The initial settings.</param>
+		public DeepConvertSettings(DeepConvertSettings source)
+		{
+			Provider = source.Provider;
+			DateFormat = source.DateFormat;
+			DateNumericKind = source.DateNumericKind;
+			DateTimeStyles = source.DateTimeStyles;
+			Encoding = source.Encoding;
+		}
+
+		/// <summary>
+		/// Gets or sets an object that supplies culture-specific formatting information.
+		/// If unset, CultureInfo.CurrentCulture is used.
+		/// </summary>
+		public IFormatProvider Provider { get; set; }
+
+		/// <summary>
+		/// Gets or sets a date format string to parse non-numeric strings with.
+		/// </summary>
+		public string DateFormat { get; set; }
+
+		/// <summary>
+		/// Gets or sets a value specifying how numeric values can be interpreted as date.
+		/// </summary>
+		public DateNumericKind DateNumericKind { get; set; } = DateNumericKind.Ticks;
+
+		/// <summary>
+		/// Gets or sets a value specifying how to interpret the parsed date in relation to the
+		/// current time zone or the current date.
+		/// </summary>
+		public DateTimeStyles DateTimeStyles { get; set; }
+
+		/// <summary>
+		/// Gets or sets the encoding that is used for conversions between characters and byte
+		/// collections. The encoding is not used for conversions from or to a single byte value
+		/// since an encoding might use multiple bytes for a given character.
+		/// </summary>
+		public Encoding Encoding { get; set; } = Encoding.UTF8;
 	}
 
 	/// <summary>
