@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018, Yves Goergen, http://unclassified.software
+﻿// Copyright (c) 2018-2019, Yves Goergen, https://unclassified.software
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 // associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -185,7 +185,6 @@ namespace Unclassified.Util
 				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //DateTime.Parse((string)value, provider);
 				if (destType == typeof(TimeSpan)) return TimeSpan.Parse((string)value, provider);
 				if (destType == typeof(Guid)) return Guid.Parse((string)value);
-				// TODO: Convert with collection of chars (also in reverse direction)
 			}
 			if (srcType == typeof(char))
 			{
@@ -438,10 +437,27 @@ namespace Unclassified.Util
 			// any classes implementing: ICollection<> (includes IList<>, ISet<>), IList
 			// dictionaries are considered collections of KeyValuePair:
 			// Dictionary<,>, ConcurrentDictionary<,>, IDictionary<,>, IDictionary
+			// strings are also considered collections of chars, if converting from/to collections
+
+			// Convert from bytes to string
+			if (typeof(IEnumerable<byte>).IsAssignableFrom(srcType) &&
+				destType == typeof(string))
+			{
+				var encoding = settings.Encoding ?? Encoding.UTF8;
+				var bytes = (IEnumerable<byte>)value;
+				return encoding.GetString(bytes.ToArray());
+			}
 
 			// Convert between collection types, then recurse into each item
 			IEnumerable<object> items = null;
-			if (typeof(IEnumerable).IsAssignableFrom(srcType))
+			// Convert from string to bytes
+			if (srcType == typeof(string) &&
+				typeof(IEnumerable<byte>).IsAssignableFrom(destType))
+			{
+				var encoding = settings.Encoding ?? Encoding.UTF8;
+				items = encoding.GetBytes((string)value).Cast<object>();
+			}
+			else if (typeof(IEnumerable).IsAssignableFrom(srcType))
 			{
 				items = ((IEnumerable)value).Cast<object>();
 			}
@@ -524,6 +540,15 @@ namespace Unclassified.Util
 						add.Invoke(list, new[] { item });
 					}
 					return list;
+				}
+				if (destType == typeof(string))
+				{
+					var sb = new StringBuilder(items.Count());
+					foreach (char item in items.Select(o => ChangeType(o, typeof(char), settings)))
+					{
+						sb.Append(item);
+					}
+					return sb.ToString();
 				}
 			}
 

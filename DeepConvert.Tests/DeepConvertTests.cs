@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Unclassified.Util
@@ -282,6 +283,76 @@ namespace Unclassified.Util
 			Assert.AreEqual(typeof(DateTime), date.GetType());
 			Assert.AreEqual(new DateTime(2010, 1, 1, 0, 0, 3), date);
 			Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);
+		}
+
+		[TestMethod]
+		public void ChangeType_CharsToString()
+		{
+			char[] chars = new char[] { 'A', 'ö', 'b', 'c', '€' };
+			string str = DeepConvert.ChangeType<string>(chars);
+			Assert.AreEqual("Aöbc€", str);
+
+			int[] numbers = new int[] { 0x41, 0xf6, 0x62, 0x63, 0x20ac };
+			str = DeepConvert.ChangeType<string>(numbers);
+			Assert.AreEqual("Aöbc€", str);
+
+			object[] mixed = new object[] { "A", 'ö', 0x62, "c", "€" };   // numeric strings not supported, must be single characters
+			str = DeepConvert.ChangeType<string>(mixed);
+			Assert.AreEqual("Aöbc€", str);
+		}
+
+		[TestMethod]
+		public void ChangeType_StringToChars()
+		{
+			string str = "Aöbc€";
+			var chars = DeepConvert.ChangeType<List<char>>(str);
+			Assert.AreEqual(5, chars.Count);
+			Assert.AreEqual('A', chars[0]);
+			Assert.AreEqual('ö', chars[1]);
+			Assert.AreEqual('b', chars[2]);
+			Assert.AreEqual('c', chars[3]);
+			Assert.AreEqual('€', chars[4]);
+		}
+
+		[TestMethod]
+		public void ChangeType_BytesToString()
+		{
+			byte[] bytes = new byte[] { /*A*/ 0x41, /*ö*/ 0xc3, 0xb6, /*b*/ 0x62, /*c*/ 0x63, /*€*/ 0xe2, 0x82, 0xac };
+			string str = DeepConvert.ChangeType<string>(bytes);   // default UTF-8
+			Assert.AreEqual("Aöbc€", str);
+
+			bytes = new byte[] { /*A*/ 0x41, 0, /*ö*/ 0xf6, 0, /*b*/ 0x62, 0, /*c*/ 0x63, 0, /*€*/ 0xac, 0x20 };
+			str = DeepConvert.ChangeType<string>(bytes, new DeepConvertSettings { Encoding = Encoding.Unicode });
+			Assert.AreEqual("Aöbc€", str);
+		}
+
+		[TestMethod]
+		public void ChangeType_StringToBytes()
+		{
+			string str = "Aöbc€";
+			var bytes = DeepConvert.ChangeType<List<byte>>(str);   // default UTF-8
+			Assert.AreEqual(8, bytes.Count);
+			Assert.AreEqual(0x41, bytes[0]);   // A
+			Assert.AreEqual(0xc3, bytes[1]);   // ö
+			Assert.AreEqual(0xb6, bytes[2]);
+			Assert.AreEqual(0x62, bytes[3]);   // b
+			Assert.AreEqual(0x63, bytes[4]);   // c
+			Assert.AreEqual(0xe2, bytes[5]);   // €
+			Assert.AreEqual(0x82, bytes[6]);
+			Assert.AreEqual(0xac, bytes[7]);
+
+			byte[] bytesArr = DeepConvert.ChangeType<byte[]>(str, new DeepConvertSettings { Encoding = Encoding.Unicode });
+			Assert.AreEqual(10, bytesArr.Length);
+			Assert.AreEqual(0x41, bytesArr[0]);   // A
+			Assert.AreEqual(0, bytesArr[1]);
+			Assert.AreEqual(0xf6, bytesArr[2]);   // ö
+			Assert.AreEqual(0, bytesArr[3]);
+			Assert.AreEqual(0x62, bytesArr[4]);   // b
+			Assert.AreEqual(0, bytesArr[5]);
+			Assert.AreEqual(0x63, bytesArr[6]);   // c
+			Assert.AreEqual(0, bytesArr[7]);
+			Assert.AreEqual(0xac, bytesArr[8]);   // €
+			Assert.AreEqual(0x20, bytesArr[9]);
 		}
 	}
 }
