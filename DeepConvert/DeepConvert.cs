@@ -30,7 +30,7 @@ namespace Unclassified.Util
 	/// <summary>
 	/// Converts a data type to another data type, including collections and their items.
 	/// </summary>
-	public static class DeepConvert
+	public static partial class DeepConvert
 	{
 		#region Private data
 
@@ -572,6 +572,25 @@ namespace Unclassified.Util
 				return value;
 			}
 
+			// Try to convert between object and dictionary
+			if (typeof(IDictionary).IsAssignableFrom(srcType) &&
+				destType.IsClass)
+			{
+				return ConvertToObject((IDictionary)value, destType, settings);
+			}
+			if (srcType.IsClass &&
+				typeof(IDictionary).IsAssignableFrom(destType))
+			{
+				var dict = ConvertToDictionary(value);
+				return ChangeType(dict, destType, settings);
+			}
+			if (srcType.IsClass &&
+				destType.IsClass)
+			{
+				var dict = ConvertToDictionary(value);
+				return ConvertToObject(dict, destType, settings);
+			}
+
 			throw new InvalidCastException($"The value '{value}' ({srcType.FullName}) cannot be converted to {destType.FullName}.");
 		}
 
@@ -673,332 +692,6 @@ namespace Unclassified.Util
 
 		#endregion ToDateTime methods
 
-		#region Simple ToX methods
-
-		#region int8
-
-		/// <summary>
-		/// Returns a <see cref="byte"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="byte"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static byte ToByte(object value) =>
-			ChangeType<byte>(value);
-
-		/// <summary>
-		/// Returns a <see cref="byte"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="byte"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static byte ToByte(object value, DeepConvertSettings settings) =>
-			ChangeType<byte>(value, settings);
-
-		/// <summary>
-		/// Returns a <see cref="sbyte"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="sbyte"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static sbyte ToSByte(object value) =>
-			ChangeType<sbyte>(value);
-
-		/// <summary>
-		/// Returns a <see cref="sbyte"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="sbyte"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static sbyte ToSByte(object value, DeepConvertSettings settings) =>
-			ChangeType<sbyte>(value, settings);
-
-		#endregion int8
-
-		#region int16
-
-		/// <summary>
-		/// Returns a <see cref="ushort"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="ushort"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static ushort ToUInt16(object value) =>
-			ChangeType<ushort>(value);
-
-		/// <summary>
-		/// Returns a <see cref="ushort"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="ushort"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static ushort ToUInt16(object value, DeepConvertSettings settings) =>
-			ChangeType<ushort>(value, settings);
-
-		/// <summary>
-		/// Returns a <see cref="short"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="short"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static short ToInt16(object value) =>
-			ChangeType<short>(value);
-
-		/// <summary>
-		/// Returns a <see cref="short"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="short"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static short ToInt16(object value, DeepConvertSettings settings) =>
-			ChangeType<short>(value, settings);
-
-		#endregion int16
-
-		#region int32
-
-		/// <summary>
-		/// Returns a <see cref="uint"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="uint"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static uint ToUInt32(object value) =>
-			ChangeType<uint>(value);
-
-		/// <summary>
-		/// Returns a <see cref="uint"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="uint"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static uint ToUInt32(object value, DeepConvertSettings settings) =>
-			ChangeType<uint>(value, settings);
-
-		/// <summary>
-		/// Returns a <see cref="int"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="int"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static int ToInt32(object value) =>
-			ChangeType<int>(value);
-
-		/// <summary>
-		/// Returns a <see cref="int"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="int"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static int ToInt32(object value, DeepConvertSettings settings) =>
-			ChangeType<int>(value, settings);
-
-		#endregion int32
-
-		#region int64
-
-		/// <summary>
-		/// Returns a <see cref="ulong"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="ulong"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static ulong ToUInt64(object value) =>
-			ChangeType<ulong>(value);
-
-		/// <summary>
-		/// Returns a <see cref="ulong"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="ulong"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static ulong ToUInt64(object value, DeepConvertSettings settings) =>
-			ChangeType<ulong>(value, settings);
-
-		/// <summary>
-		/// Returns a <see cref="long"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="long"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static long ToInt64(object value) =>
-			ChangeType<long>(value);
-
-		/// <summary>
-		/// Returns a <see cref="long"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="long"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static long ToInt64(object value, DeepConvertSettings settings) =>
-			ChangeType<long>(value, settings);
-
-		#endregion int16
-
-		#region decimal
-
-		/// <summary>
-		/// Returns a <see cref="decimal"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="decimal"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static decimal ToDecimal(object value) =>
-			ChangeType<decimal>(value);
-
-		/// <summary>
-		/// Returns a <see cref="decimal"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="decimal"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static decimal ToDecimal(object value, DeepConvertSettings settings) =>
-			ChangeType<decimal>(value, settings);
-
-		#endregion decimal
-
-		#region floats
-
-		/// <summary>
-		/// Returns a <see cref="float"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="float"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static float ToSingle(object value) =>
-			ChangeType<float>(value);
-
-		/// <summary>
-		/// Returns a <see cref="float"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="float"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static float ToSingle(object value, DeepConvertSettings settings) =>
-			ChangeType<float>(value, settings);
-
-		/// <summary>
-		/// Returns a <see cref="double"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="double"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static double ToDouble(object value) =>
-			ChangeType<double>(value);
-
-		/// <summary>
-		/// Returns a <see cref="double"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="double"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static double ToDouble(object value, DeepConvertSettings settings) =>
-			ChangeType<double>(value, settings);
-
-		#endregion floats
-
-		#region bool
-
-		/// <summary>
-		/// Returns a <see cref="bool"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="bool"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static bool ToBoolean(object value) =>
-			ChangeType<bool>(value);
-
-		/// <summary>
-		/// Returns a <see cref="bool"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="bool"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static bool ToBoolean(object value, DeepConvertSettings settings) =>
-			ChangeType<bool>(value, settings);
-
-		#endregion bool
-
-		#region string
-
-		/// <summary>
-		/// Returns a <see cref="string"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A <see cref="string"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static string ToString(object value) =>
-			ChangeType<string>(value);
-
-		/// <summary>
-		/// Returns a <see cref="string"/> value that is equivalent to the specified object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A <see cref="string"/> value that is equivalent to <paramref name="value"/>.</returns>
-		public static string ToString(object value, DeepConvertSettings settings) =>
-			ChangeType<string>(value, settings);
-
-		#endregion string
-
-		#region array
-
-		/// <summary>
-		/// Returns an array of the specified type whose value is equivalent to the specified
-		/// object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>An array whose value is equivalent to <paramref name="value"/>.</returns>
-		public static T[] ToArray<T>(object value) =>
-			ChangeType<T[]>(value);
-
-		/// <summary>
-		/// Returns an array of the specified type whose value is equivalent to the specified
-		/// object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>An array whose value is equivalent to <paramref name="value"/>.</returns>
-		public static T[] ToArray<T>(object value, DeepConvertSettings settings) =>
-			ChangeType<T[]>(value, settings);
-
-		#endregion array
-
-		#region list
-
-		/// <summary>
-		/// Returns a list of the specified type whose value is equivalent to the specified
-		/// object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A list whose value is equivalent to <paramref name="value"/>.</returns>
-		public static List<T> ToList<T>(object value) =>
-			ChangeType<List<T>>(value);
-
-		/// <summary>
-		/// Returns a list of the specified type whose value is equivalent to the specified
-		/// object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A list whose value is equivalent to <paramref name="value"/>.</returns>
-		public static List<T> ToList<T>(object value, DeepConvertSettings settings) =>
-			ChangeType<List<T>>(value, settings);
-
-		#endregion list
-
-		#region dictionary
-
-		/// <summary>
-		/// Returns a dictionary of the specified type whose value is equivalent to the specified
-		/// object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <returns>A dictionary whose value is equivalent to <paramref name="value"/>.</returns>
-		public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(object value) =>
-			ChangeType<Dictionary<TKey, TValue>>(value);
-
-		/// <summary>
-		/// Returns a dictionary of the specified type whose value is equivalent to the specified
-		/// object.
-		/// </summary>
-		/// <param name="value">The data to convert.</param>
-		/// <param name="settings">The conversion settings.</param>
-		/// <returns>A dictionary whose value is equivalent to <paramref name="value"/>.</returns>
-		public static Dictionary<TKey, TValue> ToDictionary<TKey, TValue>(object value, DeepConvertSettings settings) =>
-			ChangeType<Dictionary<TKey, TValue>>(value, settings);
-
-		#endregion dictionary
-
-		#endregion Simple ToX methods
-
 		#region Helper methods
 
 		/// <summary>
@@ -1078,85 +771,66 @@ namespace Unclassified.Util
 		}
 
 		#endregion Helper methods
-	}
 
-	/// <summary>
-	/// Provides settings for special data conversions.
-	/// </summary>
-	public class DeepConvertSettings
-	{
+		private static readonly ConcurrentDictionary<Type, ConvertTypeInfo> typeInfos =
+			new ConcurrentDictionary<Type, ConvertTypeInfo>();
+
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DeepConvertSettings"/> class.
+		/// Returns an object of the specified type whose properties have the values from equally
+		/// named dictionary keys.
 		/// </summary>
-		public DeepConvertSettings()
+		/// <typeparam name="T">The type to convert the data to.</typeparam>
+		/// <param name="dict">The data to set in the object properties.</param>
+		/// <param name="settings">The conversion settings.</param>
+		/// <returns>An object whose properties have the values from equally named dictionary keys.</returns>
+		public static T ConvertToObject<T>(IDictionary dict, DeepConvertSettings settings) =>
+			(T)ConvertToObject(dict, typeof(T), settings);
+
+		/// <summary>
+		/// Returns an object of the specified type whose properties have the values from equally
+		/// named dictionary keys.
+		/// </summary>
+		/// <param name="dict">The data to set in the object properties.</param>
+		/// <param name="type">The type to convert the data to.</param>
+		/// <param name="settings">The conversion settings.</param>
+		/// <returns>An object whose properties have the values from equally named dictionary keys.</returns>
+		public static object ConvertToObject(IDictionary dict, Type type, DeepConvertSettings settings)
 		{
+			var typeInfo = GetTypeInfo(type);
+			object obj = typeInfo.CreateInstance();
+			foreach (object key in dict.Keys)
+			{
+				string name = ToString(key, settings);
+				typeInfo.SetValue(obj, name, dict[key], settings);
+			}
+			return obj;
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DeepConvertSettings"/> class from another
-		/// instance.
+		/// Returns a dictionary that contains keys and values of equally named properties of the
+		/// specified object.
 		/// </summary>
-		/// <param name="source">The initial settings.</param>
-		public DeepConvertSettings(DeepConvertSettings source)
+		/// <param name="obj">The object to convert to a dictionary.</param>
+		/// <returns>A dictionary that contains the data from the object properties.</returns>
+		public static Dictionary<string, object> ConvertToDictionary(object obj)
 		{
-			Provider = source.Provider;
-			DateFormat = source.DateFormat;
-			DateNumericKind = source.DateNumericKind;
-			DateTimeStyles = source.DateTimeStyles;
-			Encoding = source.Encoding;
+			var typeInfo = GetTypeInfo(obj.GetType());
+			var dict = new Dictionary<string, object>();
+			foreach (string name in typeInfo.GetNames())
+			{
+				dict[name] = typeInfo.GetValue(obj, name);
+			}
+			return dict;
 		}
 
 		/// <summary>
-		/// Gets or sets an object that supplies culture-specific formatting information.
-		/// If unset, CultureInfo.CurrentCulture is used.
+		/// Creates and caches the reflection type info to access the properties of a type.
 		/// </summary>
-		public IFormatProvider Provider { get; set; }
-
-		/// <summary>
-		/// Gets or sets a date format string to parse non-numeric strings with.
-		/// </summary>
-		public string DateFormat { get; set; }
-
-		/// <summary>
-		/// Gets or sets a value specifying how numeric values can be interpreted as date.
-		/// </summary>
-		public DateNumericKind DateNumericKind { get; set; } = DateNumericKind.Ticks;
-
-		/// <summary>
-		/// Gets or sets a value specifying how to interpret the parsed date in relation to the
-		/// current time zone or the current date.
-		/// </summary>
-		public DateTimeStyles DateTimeStyles { get; set; }
-
-		/// <summary>
-		/// Gets or sets the encoding that is used for conversions between characters and byte
-		/// collections. The encoding is not used for conversions from or to a single byte value
-		/// since an encoding might use multiple bytes for a given character.
-		/// </summary>
-		public Encoding Encoding { get; set; } = Encoding.UTF8;
-	}
-
-	/// <summary>
-	/// Defines how numeric values can be interpreted as date.
-	/// </summary>
-	public enum DateNumericKind
-	{
-		/// <summary>
-		/// No numeric interpretation of strings converting to <see cref="DateTime"/>.
-		/// When converting other types, this is equivalent to <see cref="Ticks"/>.
-		/// </summary>
-		None,
-		/// <summary>
-		/// Ticks of 100 nanoseconds since 0001-01-01T00:00:00 (.NET and Windows).
-		/// </summary>
-		Ticks,
-		/// <summary>
-		/// Seconds since UNIX epoch, 1970-01-01T00:00:00Z (Linux, PHP, and more).
-		/// </summary>
-		UnixSeconds,
-		/// <summary>
-		/// Milliseconds since UNIX epoch, 1970-01-01T00:00:00Z (JavaScript).
-		/// </summary>
-		UnixMilliseconds,
+		/// <param name="type">The type to inspect.</param>
+		/// <returns>The <see cref="ConvertTypeInfo"/> instance to access the type properties.</returns>
+		private static ConvertTypeInfo GetTypeInfo(Type type)
+		{
+			return typeInfos.GetOrAdd(type, t => new ConvertTypeInfo(t));
+		}
 	}
 }

@@ -4,27 +4,25 @@
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <RootNamespace>Unclassified.Util</RootNamespace>
     <AssemblyName>Unclassified.DeepConvert</AssemblyName>
-    <Version>1.2.7</Version>
+    <Version>1.3.0</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Description>Converts a data type to another data type, including collections and their items. With special support for DateTime conversions.</Description>
+    <Description>Converts a data type to another data type, including collections and their items as well as object properties (duck typing). With special support for DateTime conversions.</Description>
     <Copyright>Yves Goergen</Copyright>
     <Authors>Yves Goergen</Authors>
     <Company />
-    <PackageTags>convert conversion collections data datetime timestamp type cast types</PackageTags>
+    <PackageTags>convert conversion collections data datetime timestamp type cast types duck typing duck-typing</PackageTags>
     <PackageProjectUrl>https://github.com/ygoe/DeepConvert</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/ygoe/DeepConvert/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ygoe/DeepConvert</RepositoryUrl>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>bin\Release\netstandard2.0\Unclassified.DeepConvert.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\Unclassified.DeepConvert.xml</DocumentationFile>
-  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+  </ItemGroup>
 
 </Project>
