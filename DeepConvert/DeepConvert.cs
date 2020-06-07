@@ -155,7 +155,7 @@ namespace Unclassified.Util
 				srcType == typeof(long) || srcType == typeof(ulong) ||
 				srcType == typeof(float) || srcType == typeof(double) || srcType == typeof(decimal))
 			{
-				if (destType == typeof(string) || destType == typeof(char) ||
+				if (destType == typeof(char) ||
 					destType == typeof(byte) || destType == typeof(sbyte) ||
 					destType == typeof(short) || destType == typeof(ushort) ||
 					destType == typeof(int) || destType == typeof(uint) ||
@@ -292,7 +292,7 @@ namespace Unclassified.Util
 			if (srcType.IsEnum)
 			{
 				object enumValue = Convert.ChangeType(value, Enum.GetUnderlyingType(srcType), provider);
-				if (destType == typeof(string) || destType == typeof(char) ||
+				if (destType == typeof(char) ||
 					destType == typeof(byte) || destType == typeof(sbyte) ||
 					destType == typeof(short) || destType == typeof(ushort) ||
 					destType == typeof(int) || destType == typeof(uint) ||
@@ -364,9 +364,9 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(string))
 				{
-					if (!string.IsNullOrEmpty(settings.DateFormat))
+					if (!string.IsNullOrEmpty(settings.Format))
 					{
-						return ((DateTime)value).ToString(settings.DateFormat, provider);
+						return ((DateTime)value).ToString(settings.Format, provider);
 					}
 					return ((DateTime)value).ToString(provider);
 				}
@@ -399,7 +399,14 @@ namespace Unclassified.Util
 			}
 			if (srcType == typeof(TimeSpan))
 			{
-				if (destType == typeof(string)) return ((TimeSpan)value).ToString();
+				if (destType == typeof(string))
+				{
+					if (!string.IsNullOrEmpty(settings.Format))
+					{
+						return ((TimeSpan)value).ToString(settings.Format, provider);
+					}
+					return ((TimeSpan)value).ToString("c", provider);
+				}
 				if (destType == typeof(char) ||
 					destType == typeof(byte) || destType == typeof(sbyte) ||
 					destType == typeof(short) || destType == typeof(ushort) ||
@@ -430,7 +437,7 @@ namespace Unclassified.Util
 			}
 			if (srcType == typeof(Guid))
 			{
-				if (destType == typeof(string)) return ((Guid)value).ToString();
+				//if (destType == typeof(string)) return ((Guid)value).ToString();
 				// No conversion to char, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, decimal,
 				// Enum, BigInteger, DateTime and TimeSpan
 				if (destType == typeof(Guid)) return value;
@@ -560,7 +567,14 @@ namespace Unclassified.Util
 
 			// TODO: Convert between atomic and collection types (needs recursion?) (take care of KeyValuePair (a tuple) <-> Dictionary (a collection))
 
-			// At least try IConvertible if srcType implements it
+			// Try IFormattable if srcType implements it
+			if (destType == typeof(string) &&
+				typeof(IFormattable).IsAssignableFrom(srcType))
+			{
+				return ((IFormattable)value).ToString(settings.Format, provider);
+			}
+
+			// Try IConvertible if srcType implements it
 			if (typeof(IConvertible).IsAssignableFrom(srcType))
 			{
 				return Convert.ChangeType(value, destType, provider);
@@ -681,8 +695,8 @@ namespace Unclassified.Util
 						return ConvertNumeric(num2, settings.DateNumericKind, defaultKind);
 				}
 
-				if (!string.IsNullOrWhiteSpace(settings.DateFormat) &&
-					DateTime.TryParseExact(str, settings.DateFormat, provider, settings.DateTimeStyles, out DateTime date))
+				if (!string.IsNullOrWhiteSpace(settings.Format) &&
+					DateTime.TryParseExact(str, settings.Format, provider, settings.DateTimeStyles, out DateTime date))
 					return date;
 				if (DateTime.TryParse(str, provider, settings.DateTimeStyles, out date))
 					return date;

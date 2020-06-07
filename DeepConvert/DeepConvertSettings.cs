@@ -24,7 +24,7 @@ namespace Unclassified.Util
 		public DeepConvertSettings(DeepConvertSettings source)
 		{
 			Provider = source.Provider;
-			DateFormat = source.DateFormat;
+			Format = source.Format;
 			DateNumericKind = source.DateNumericKind;
 			DateTimeStyles = source.DateTimeStyles;
 			Encoding = source.Encoding;
@@ -39,7 +39,17 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Gets or sets a date format string to parse non-numeric strings with.
 		/// </summary>
-		public string DateFormat { get; set; }
+		public string Format { get; set; }
+
+		/// <summary>
+		/// Gets or sets a date format string to parse non-numeric strings with.
+		/// </summary>
+		[Obsolete("Use the Format property instead.")]
+		public string DateFormat
+		{
+			get => Format;
+			set => Format = value;
+		}
 
 		/// <summary>
 		/// Gets or sets a value specifying how numeric values can be interpreted as date.

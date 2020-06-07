@@ -16,11 +16,19 @@ namespace Unclassified.Util
 		{
 			var ics = new DeepConvertSettings
 			{
-				Provider = CultureInfo.InvariantCulture
+				Provider = CultureInfo.InvariantCulture,
+				Format = "0.00"
+			};
+			var decs = new DeepConvertSettings
+			{
+				Provider = CultureInfo.GetCultureInfo("de-DE"),
+				Format = "0.00"
 			};
 
 			Assert.AreEqual(20, DeepConvert.ChangeType<byte>(20));
 			Assert.AreEqual("20", DeepConvert.ChangeType<string>(20.0));
+			Assert.AreEqual("20.00", DeepConvert.ChangeType<string>(20.0, ics));
+			Assert.AreEqual("20,00", DeepConvert.ChangeType<string>(20.0, decs));
 			Assert.AreEqual(false, DeepConvert.ChangeType<bool>(0));
 			Assert.AreEqual(true, DeepConvert.ChangeType<bool>(20));
 			Assert.AreEqual(false, DeepConvert.ChangeType<bool>(0.0));
@@ -49,6 +57,16 @@ namespace Unclassified.Util
 			Assert.AreEqual(true, DeepConvert.ChangeType<bool>("true"));
 			Assert.AreEqual(true, DeepConvert.ChangeType<bool>("123"));
 			Assert.AreEqual(true, DeepConvert.ChangeType<bool>("abc"));
+		}
+
+		[TestMethod]
+		public void ChangeType_TimeSpan()
+		{
+			var timeSpan = TimeSpan.FromSeconds(62);
+
+			Assert.AreEqual("00:01:02", DeepConvert.ChangeType<string>(timeSpan));
+			Assert.AreEqual("00:01:02", DeepConvert.ChangeType<string>(timeSpan, new DeepConvertSettings { Format = "c" }));
+			Assert.AreEqual("1:02.000", DeepConvert.ChangeType<string>(timeSpan, new DeepConvertSettings { Format = @"m\:ss\.fff" }));
 		}
 
 		private enum Enum1 : short
@@ -220,7 +238,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_StringFormat()
 		{
-			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", new DeepConvertSettings { DateFormat = "yy.MM.dd HH.mm.ss" });
+			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", new DeepConvertSettings { Format = "yy.MM.dd HH.mm.ss" });
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6), date);
 			Assert.AreEqual(DateTimeKind.Unspecified, date.Kind);
 		}
@@ -228,7 +246,7 @@ namespace Unclassified.Util
 		[TestMethod]
 		public void ToDateTime_StringFormatLocal()
 		{
-			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", new DeepConvertSettings { DateFormat = "yy.MM.dd HH.mm.ss", DateTimeStyles = DateTimeStyles.AssumeLocal });
+			var date = DeepConvert.ToDateTime("18.02.03 04.05.06", new DeepConvertSettings { Format = "yy.MM.dd HH.mm.ss", DateTimeStyles = DateTimeStyles.AssumeLocal });
 			Assert.AreEqual(new DateTime(2018, 2, 3, 4, 5, 6), date);
 			Assert.AreEqual(DateTimeKind.Local, date.Kind);
 		}
@@ -256,7 +274,7 @@ namespace Unclassified.Util
 				new object[] { 10 * 86400, "18.02.03 04.05.06" },
 				new DeepConvertSettings
 				{
-					DateFormat = "yy.MM.dd HH.mm.ss",
+					Format = "yy.MM.dd HH.mm.ss",
 					DateNumericKind = DateNumericKind.UnixSeconds,
 					DateTimeStyles = DateTimeStyles.AssumeLocal
 				});
@@ -276,7 +294,7 @@ namespace Unclassified.Util
 				new DeepConvertSettings
 				{
 					Provider = CultureInfo.InvariantCulture,
-					DateFormat = "yyyyMMddHHmmss",
+					Format = "yyyyMMddHHmmss",
 					DateNumericKind = DateNumericKind.None,
 					DateTimeStyles = DateTimeStyles.None
 				});
