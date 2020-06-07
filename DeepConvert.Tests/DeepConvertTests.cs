@@ -385,8 +385,10 @@ namespace Unclassified.Util
 
 		public class DataClass2
 		{
+#pragma warning disable IDE1006   // Lower case member name is intentional for testing purposes
 			public int flag { get; set; }
 			public long number { get; set; }
+#pragma warning restore IDE1006
 			public string Text { get; set; }
 			public double[] Floats { get; set; }
 			public bool Add { get; set; } = true;

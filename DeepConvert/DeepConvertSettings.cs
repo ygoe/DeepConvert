@@ -91,6 +91,6 @@ namespace Unclassified.Util
 		/// <summary>
 		/// Milliseconds since UNIX epoch, 1970-01-01T00:00:00Z (JavaScript).
 		/// </summary>
-		UnixMilliseconds,
+		UnixMilliseconds
 	}
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2019, Yves Goergen, https://unclassified.software
+﻿// Copyright (c) 2018-2020, Yves Goergen, https://unclassified.software
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 // associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -63,7 +63,7 @@ namespace Unclassified.Util
 		/// <summary>
 		/// The UNIX epoch time.
 		/// </summary>
-		private static DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		#endregion Private data
 
@@ -139,7 +139,7 @@ namespace Unclassified.Util
 			if (Nullable.GetUnderlyingType(destType) != null)
 			{
 				// Special handling for empty strings
-				if (value is string && (string)value == "")
+				if (value is string str && str == "")
 					return null;
 
 				return ChangeType(value, Nullable.GetUnderlyingType(destType), settings);
@@ -188,103 +188,103 @@ namespace Unclassified.Util
 			{
 				if (destType == typeof(bool)) return !falseWords.Any(w => string.Equals(w, (string)value, StringComparison.OrdinalIgnoreCase));
 				if (destType == typeof(BigInteger)) return BigInteger.Parse((string)value, provider);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //DateTime.Parse((string)value, provider);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return TimeSpan.Parse((string)value, provider);
 				if (destType == typeof(Guid)) return Guid.Parse((string)value);
 			}
 			if (srcType == typeof(char))
 			{
-				if (destType == typeof(bool)) return !value.Equals((char)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((char)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((char)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((char)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((char)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(byte))
 			{
-				if (destType == typeof(bool)) return !value.Equals((byte)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((byte)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((byte)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((byte)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((byte)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(sbyte))
 			{
-				if (destType == typeof(bool)) return !value.Equals((sbyte)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((sbyte)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((sbyte)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((sbyte)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((sbyte)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(short))
 			{
-				if (destType == typeof(bool)) return !value.Equals((short)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((short)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((short)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((short)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((short)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(ushort))
 			{
-				if (destType == typeof(bool)) return !value.Equals((ushort)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((ushort)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((ushort)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((ushort)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((ushort)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(int))
 			{
-				if (destType == typeof(bool)) return !value.Equals(0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals(0);
 				if (destType == typeof(BigInteger)) return new BigInteger((int)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((int)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((int)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(uint))
 			{
-				if (destType == typeof(bool)) return !value.Equals((uint)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((uint)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((uint)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((uint)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((uint)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(long))
 			{
-				if (destType == typeof(bool)) return !value.Equals((long)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((long)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((long)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(ulong))
 			{
-				if (destType == typeof(bool)) return !value.Equals((ulong)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((ulong)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((ulong)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(ulong)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(ulong)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(float))
 			{
-				if (destType == typeof(bool)) return !value.Equals((float)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((float)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((float)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(float)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(float)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(double))
 			{
-				if (destType == typeof(bool)) return !value.Equals((double)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((double)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((double)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(double)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(double)value);
 				// No conversion to Guid
 			}
 			if (srcType == typeof(decimal))
 			{
-				if (destType == typeof(bool)) return !value.Equals((decimal)0) ? true : false;
+				if (destType == typeof(bool)) return !value.Equals((decimal)0);
 				if (destType == typeof(BigInteger)) return new BigInteger((decimal)value);
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime((long)(decimal)value);
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan((long)(decimal)value);
 				// No conversion to Guid
 			}
@@ -306,9 +306,9 @@ namespace Unclassified.Util
 					object enumNumericValue = Convert.ChangeType(enumValue, Enum.GetUnderlyingType(destType), provider);
 					return Enum.ToObject(destType, enumNumericValue);
 				}
-				if (destType == typeof(bool)) return !enumValue.Equals(0) ? true : false;
+				if (destType == typeof(bool)) return !enumValue.Equals(0);
 				if (destType == typeof(BigInteger)) return new BigInteger(Convert.ToInt64(enumValue));
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime(Convert.ToInt64(enumValue));
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan(Convert.ToInt64(enumValue));
 				// No conversion to Guid
 			}
@@ -354,9 +354,9 @@ namespace Unclassified.Util
 					object enumNumericValue = Convert.ChangeType(((BigInteger)value).ToString(), Enum.GetUnderlyingType(destType), provider);
 					return Enum.ToObject(destType, enumNumericValue);
 				}
-				if (destType == typeof(bool)) return !((BigInteger)value).IsZero ? true : false;
+				if (destType == typeof(bool)) return !((BigInteger)value).IsZero;
 				if (destType == typeof(BigInteger)) return value;
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime(Convert.ToInt64(((BigInteger)value).ToString(), provider));
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return new TimeSpan(Convert.ToInt64(((BigInteger)value).ToString(), provider));
 				// No conversion to Guid
 			}
@@ -392,9 +392,9 @@ namespace Unclassified.Util
 							throw new ArgumentException("Unknown date numeric kind.");
 					}
 				}
-				if (destType == typeof(bool)) return ((DateTime)value).Ticks != 0 ? true : false;
+				if (destType == typeof(bool)) return ((DateTime)value).Ticks != 0;
 				if (destType == typeof(DateTime)) return value;
-				if (destType == typeof(TimeSpan)) return ((DateTime)value).TimeOfDay; //new TimeSpan(((DateTime)value).Ticks);
+				if (destType == typeof(TimeSpan)) return ((DateTime)value).TimeOfDay;
 				// No conversion to Guid
 			}
 			if (srcType == typeof(TimeSpan))
@@ -430,8 +430,8 @@ namespace Unclassified.Util
 					}
 					//return Convert.ChangeType(((TimeSpan)value).Ticks, destType);
 				}
-				if (destType == typeof(bool)) return ((TimeSpan)value).Ticks != 0 ? true : false;
-				if (destType == typeof(DateTime)) return ToDateTime(value, settings); //new DateTime(((TimeSpan)value).Ticks);
+				if (destType == typeof(bool)) return ((TimeSpan)value).Ticks != 0;
+				if (destType == typeof(DateTime)) return ToDateTime(value, settings);
 				if (destType == typeof(TimeSpan)) return value;
 				// No conversion to Guid
 			}

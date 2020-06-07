@@ -14,8 +14,8 @@ namespace Unclassified.Util
 	{
 		#region Static members
 
-		private static AssemblyBuilder assemblyBuilder;
-		private static ModuleBuilder moduleBuilder;
+		private static readonly AssemblyBuilder assemblyBuilder;
+		private static readonly ModuleBuilder moduleBuilder;
 
 		static ConvertTypeInfo()
 		{
@@ -247,7 +247,7 @@ namespace Unclassified.Util
 				ilGen.Emit(OpCodes.Ldloc_0);
 				ilGen.Emit(OpCodes.Ldarg_2);
 				ilGen.Emit(OpCodes.Ldtoken, propertyInfo.PropertyType);
-				ilGen.EmitCall(OpCodes.Call, MethodOf(() => Type.GetTypeFromHandle(default(RuntimeTypeHandle))), null);
+				ilGen.EmitCall(OpCodes.Call, MethodOf(() => Type.GetTypeFromHandle(default)), null);
 				ilGen.Emit(OpCodes.Ldarg_3);
 				ilGen.EmitCall(OpCodes.Call, MethodOf(() => DeepConvert.ChangeType(null, null, null)), null);
 				if (propertyInfo.PropertyType.IsValueType)
