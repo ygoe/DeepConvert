@@ -14,6 +14,7 @@
     <Copyright>Yves Goergen</Copyright>
     <Authors>Yves Goergen</Authors>
     <Company />
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>convert conversion collections data datetime timestamp type cast types duck typing duck-typing</PackageTags>
     <PackageProjectUrl>https://github.com/ygoe/DeepConvert</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/ygoe/DeepConvert/blob/master/LICENSE</PackageLicenseUrl>
