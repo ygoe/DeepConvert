@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2018-2020, Yves Goergen, https://unclassified.software
+﻿// Copyright (c) 2018-2022, Yves Goergen, https://ygoe.de
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
 // associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -65,6 +65,16 @@ namespace Unclassified.Util
 		/// </summary>
 		private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+		/// <summary>
+		/// An empty settings instance that can be used to avoid allocation.
+		/// </summary>
+		private static readonly DeepConvertSettings emptySettings = new DeepConvertSettings();
+
+		/// <summary>
+		/// A preset settings instance for the invariant culture to avoid allocation.
+		/// </summary>
+		private static readonly DeepConvertSettings invariantSettings = new DeepConvertSettings { Provider = CultureInfo.InvariantCulture };
+
 		#endregion Private data
 
 		#region Main ChangeType methods
@@ -78,7 +88,7 @@ namespace Unclassified.Util
 		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
 		///   to <paramref name="value"/>.</returns>
 		public static T ChangeType<T>(object value) =>
-			(T)ChangeType(value, typeof(T), new DeepConvertSettings());
+			(T)ChangeType(value, typeof(T), emptySettings);
 
 		/// <summary>
 		/// Returns an object of the specified type whose value is equivalent to the specified
@@ -101,7 +111,7 @@ namespace Unclassified.Util
 		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
 		///   equivalent to <paramref name="value"/>.</returns>
 		public static object ChangeType(object value, Type destType) =>
-			ChangeType(value, destType, new DeepConvertSettings());
+			ChangeType(value, destType, emptySettings);
 
 		/// <summary>
 		/// Returns an object of the specified type whose value is equivalent to the specified
@@ -610,6 +620,58 @@ namespace Unclassified.Util
 
 		#endregion Main ChangeType methods
 
+		#region ChangeTypeInvariant methods
+
+		/// <summary>
+		/// Returns an object of the specified type whose value is equivalent to the specified
+		/// object, using the invariant culture.
+		/// </summary>
+		/// <typeparam name="T">The type to convert the data to.</typeparam>
+		/// <param name="value">The data to convert.</param>
+		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
+		///   to <paramref name="value"/>.</returns>
+		public static T ChangeTypeInvariant<T>(object value) =>
+			(T)ChangeType(value, typeof(T), invariantSettings);
+
+		/// <summary>
+		/// Returns an object of the specified type whose value is equivalent to the specified
+		/// object, using the invariant culture.
+		/// </summary>
+		/// <typeparam name="T">The type to convert the data to.</typeparam>
+		/// <param name="value">The data to convert.</param>
+		/// <param name="settings">The conversion settings. The <see cref="DeepConvertSettings.Provider"/>
+		///   will be overwritten with <see cref="CultureInfo.InvariantCulture"/>.</param>
+		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
+		///   to <paramref name="value"/>.</returns>
+		public static T ChangeTypeInvariant<T>(object value, DeepConvertSettings settings) =>
+			(T)ChangeType(value, typeof(T), new DeepConvertSettings(settings) { Provider = CultureInfo.InvariantCulture });
+
+		/// <summary>
+		/// Returns an object of the specified type whose value is equivalent to the specified
+		/// object, using the invariant culture.
+		/// </summary>
+		/// <param name="value">The data to convert.</param>
+		/// <param name="destType">The type to convert the data to.</param>
+		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
+		///   equivalent to <paramref name="value"/>.</returns>
+		public static object ChangeTypeInvariant(object value, Type destType) =>
+			ChangeType(value, destType, invariantSettings);
+
+		/// <summary>
+		/// Returns an object of the specified type whose value is equivalent to the specified
+		/// object, using the invariant culture.
+		/// </summary>
+		/// <param name="value">The data to convert.</param>
+		/// <param name="destType">The type to convert the data to.</param>
+		/// <param name="settings">The conversion settings. The <see cref="DeepConvertSettings.Provider"/>
+		///   will be overwritten with <see cref="CultureInfo.InvariantCulture"/>.</param>
+		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
+		///   equivalent to <paramref name="value"/>.</returns>
+		public static object ChangeTypeInvariant(object value, Type destType, DeepConvertSettings settings) =>
+			ChangeType(value, destType, new DeepConvertSettings(settings) { Provider = CultureInfo.InvariantCulture });
+
+		#endregion ChangeTypeInvariant methods
+
 		#region ToDateTime methods
 
 		/// <summary>
@@ -618,7 +680,7 @@ namespace Unclassified.Util
 		/// <param name="value">The data to convert.</param>
 		/// <returns>A <see cref="DateTime"/> value that is equivalent to <paramref name="value"/>.</returns>
 		public static DateTime ToDateTime(object value) =>
-			ToDateTime(value, new DeepConvertSettings());
+			ToDateTime(value, emptySettings);
 
 		/// <summary>
 		/// Returns a <see cref="DateTime"/> value that is equivalent to the specified object.

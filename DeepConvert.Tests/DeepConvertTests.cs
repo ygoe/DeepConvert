@@ -41,6 +41,8 @@ namespace Unclassified.Util
 			Assert.AreEqual(100, DeepConvert.ChangeType<double>("100.0", ics));
 			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100"));
 			Assert.AreEqual(100, DeepConvert.ChangeType<decimal>("100.0", ics));
+			Assert.AreEqual(100, DeepConvert.ChangeTypeInvariant<decimal>("100.0"));
+			Assert.AreEqual(100, DeepConvert.ChangeTypeInvariant<decimal>("100.0", decs));
 		}
 
 		[TestMethod]

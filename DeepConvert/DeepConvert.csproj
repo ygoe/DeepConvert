@@ -1,29 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
-    <RootNamespace>Unclassified.Util</RootNamespace>
-    <AssemblyName>Unclassified.DeepConvert</AssemblyName>
-    <Version>1.3.0</Version>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
+		<RootNamespace>Unclassified.Util</RootNamespace>
+		<AssemblyName>Unclassified.DeepConvert</AssemblyName>
+		<Version>1.4.0</Version>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Description>Converts a data type to another data type, including collections and their items as well as object properties (duck typing). With special support for DateTime conversions.</Description>
-    <Copyright>Yves Goergen</Copyright>
-    <Authors>Yves Goergen</Authors>
-    <Company />
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>convert conversion collections data datetime timestamp type cast types duck typing duck-typing</PackageTags>
-    <PackageProjectUrl>https://github.com/ygoe/DeepConvert</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ygoe/DeepConvert/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/ygoe/DeepConvert</RepositoryUrl>
-  </PropertyGroup>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<Description>Converts a data type to another data type, smarter than the standard Convert class, including collections and their items as well as object properties (duck typing). With special support for DateTime conversions.</Description>
+		<Copyright>Yves Goergen</Copyright>
+		<Authors>Yves Goergen</Authors>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageTags>convert conversion collections data datetime timestamp type cast types duck typing duck-typing</PackageTags>
+		<PackageProjectUrl>https://github.com/ygoe/DeepConvert</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/ygoe/DeepConvert</RepositoryUrl>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
-    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+		<PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
+	</ItemGroup>
 
 </Project>
