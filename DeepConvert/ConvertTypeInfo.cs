@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -37,7 +38,9 @@ namespace Unclassified.Util
 
 		#region Constructors
 
-		public ConvertTypeInfo(Type type)
+		public ConvertTypeInfo(
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+			Type type)
 		{
 			Type = type;
 
@@ -82,7 +85,11 @@ namespace Unclassified.Util
 
 		#region Public members
 
-		public Type Type { get; }
+		public Type Type
+		{
+			[return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+			get;
+		}
 
 		public object CreateInstance() => Activator.CreateInstance(Type);
 
@@ -103,7 +110,9 @@ namespace Unclassified.Util
 		#region Private methods
 
 		// From Unclassified.Util.TypeExtensions.GetAllProperties method
-		private static PropertyInfo[] GetAllProperties(Type type)
+		private static PropertyInfo[] GetAllProperties(
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+			Type type)
 		{
 			var properties = new List<PropertyInfo>();
 			do

@@ -20,6 +20,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
@@ -87,7 +88,7 @@ namespace Unclassified.Util
 		/// <param name="value">The data to convert.</param>
 		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
 		///   to <paramref name="value"/>.</returns>
-		public static T ChangeType<T>(object value) =>
+		public static T ChangeType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] T>(object value) =>
 			(T)ChangeType(value, typeof(T), emptySettings);
 
 		/// <summary>
@@ -99,7 +100,7 @@ namespace Unclassified.Util
 		/// <param name="settings">The conversion settings.</param>
 		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
 		///   to <paramref name="value"/>.</returns>
-		public static T ChangeType<T>(object value, DeepConvertSettings settings) =>
+		public static T ChangeType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] T>(object value, DeepConvertSettings settings) =>
 			(T)ChangeType(value, typeof(T), settings);
 
 		/// <summary>
@@ -110,7 +111,9 @@ namespace Unclassified.Util
 		/// <param name="destType">The type to convert the data to.</param>
 		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
 		///   equivalent to <paramref name="value"/>.</returns>
-		public static object ChangeType(object value, Type destType) =>
+		public static object ChangeType(
+			object value,
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] Type destType) =>
 			ChangeType(value, destType, emptySettings);
 
 		/// <summary>
@@ -122,7 +125,10 @@ namespace Unclassified.Util
 		/// <param name="settings">The conversion settings.</param>
 		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
 		///   equivalent to <paramref name="value"/>.</returns>
-		public static object ChangeType(object value, Type destType, DeepConvertSettings settings)
+		public static object ChangeType(
+			object value,
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] Type destType,
+			DeepConvertSettings settings)
 		{
 			var provider = settings.Provider;
 			if (provider == null)
@@ -630,7 +636,7 @@ namespace Unclassified.Util
 		/// <param name="value">The data to convert.</param>
 		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
 		///   to <paramref name="value"/>.</returns>
-		public static T ChangeTypeInvariant<T>(object value) =>
+		public static T ChangeTypeInvariant<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] T>(object value) =>
 			(T)ChangeType(value, typeof(T), invariantSettings);
 
 		/// <summary>
@@ -643,7 +649,7 @@ namespace Unclassified.Util
 		///   will be overwritten with <see cref="CultureInfo.InvariantCulture"/>.</param>
 		/// <returns>An object whose type is <typeparamref name="T"/> and whose value is equivalent
 		///   to <paramref name="value"/>.</returns>
-		public static T ChangeTypeInvariant<T>(object value, DeepConvertSettings settings) =>
+		public static T ChangeTypeInvariant<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] T>(object value, DeepConvertSettings settings) =>
 			(T)ChangeType(value, typeof(T), new DeepConvertSettings(settings) { Provider = CultureInfo.InvariantCulture });
 
 		/// <summary>
@@ -654,7 +660,9 @@ namespace Unclassified.Util
 		/// <param name="destType">The type to convert the data to.</param>
 		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
 		///   equivalent to <paramref name="value"/>.</returns>
-		public static object ChangeTypeInvariant(object value, Type destType) =>
+		public static object ChangeTypeInvariant(
+			object value,
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] Type destType) =>
 			ChangeType(value, destType, invariantSettings);
 
 		/// <summary>
@@ -667,7 +675,10 @@ namespace Unclassified.Util
 		///   will be overwritten with <see cref="CultureInfo.InvariantCulture"/>.</param>
 		/// <returns>An object whose type is <paramref name="destType"/> and whose value is
 		///   equivalent to <paramref name="value"/>.</returns>
-		public static object ChangeTypeInvariant(object value, Type destType, DeepConvertSettings settings) =>
+		public static object ChangeTypeInvariant(
+			object value,
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)] Type destType,
+			DeepConvertSettings settings) =>
 			ChangeType(value, destType, new DeepConvertSettings(settings) { Provider = CultureInfo.InvariantCulture });
 
 		#endregion ChangeTypeInvariant methods
@@ -775,7 +786,8 @@ namespace Unclassified.Util
 		/// </summary>
 		/// <param name="type">The type to return the default value of.</param>
 		/// <returns>The default value of <paramref name="type"/>.</returns>
-		public static object GetDefaultValue(Type type)
+		public static object GetDefaultValue(
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
 		{
 			if (type.IsValueType)
 				return Activator.CreateInstance(type);
@@ -784,7 +796,7 @@ namespace Unclassified.Util
 		}
 
 		private static object CreateTuple(
-			Type tupleType,
+			[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type tupleType,
 			IEnumerable<object> items,
 			DeepConvertSettings settings)
 		{
@@ -906,7 +918,13 @@ namespace Unclassified.Util
 		/// <returns>The <see cref="ConvertTypeInfo"/> instance to access the type properties.</returns>
 		private static ConvertTypeInfo GetTypeInfo(Type type)
 		{
-			return typeInfos.GetOrAdd(type, t => new ConvertTypeInfo(t));
+			return typeInfos.GetOrAdd(
+				type,
+				(
+#if NET5_0_OR_GREATER
+				[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+				t) => new ConvertTypeInfo(t));
 		}
 	}
 }
