@@ -848,8 +848,7 @@ namespace Unclassified.Util
 
 		#endregion Helper methods
 
-		private static readonly ConcurrentDictionary<Type, ConvertTypeInfo> typeInfos =
-			new ConcurrentDictionary<Type, ConvertTypeInfo>();
+		private static readonly Dictionary<Type, ConvertTypeInfo> typeInfos = new Dictionary<Type, ConvertTypeInfo>();
 
 		/// <summary>
 		/// Returns an object of the specified type whose properties have the values from equally
@@ -906,7 +905,15 @@ namespace Unclassified.Util
 		/// <returns>The <see cref="ConvertTypeInfo"/> instance to access the type properties.</returns>
 		private static ConvertTypeInfo GetTypeInfo(Type type)
 		{
-			return typeInfos.GetOrAdd(type, t => new ConvertTypeInfo(t));
+			lock (typeInfos)
+			{
+				if (!typeInfos.TryGetValue(type, out var convertTypeInfo))
+				{
+					convertTypeInfo = new ConvertTypeInfo(type);
+					typeInfos.Add(type, convertTypeInfo);
+				}
+				return convertTypeInfo;
+			}
 		}
 	}
 }
